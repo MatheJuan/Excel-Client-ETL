@@ -28,7 +28,7 @@ public class ReaderExcel {
 
             while(rowIterator.hasNext()){
                 Row row = rowIterator.next();
-                //
+                //Evita iteracao com coluna vazia
                 Cliente cliente = new Cliente();
                 Cell cell0 = row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 Cell cell1 = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
