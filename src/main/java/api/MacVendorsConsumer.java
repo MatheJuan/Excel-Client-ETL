@@ -12,7 +12,7 @@ public  class MacVendorsConsumer {
     public static boolean isValid(String mac){
         try {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://macvendors.com/"+mac)).GET().build();
+                .uri(URI.create("https://api.macvendors.com"+mac)).GET().build();
 
         HttpResponse<String> response = cliente.send(request, HttpResponse.BodyHandlers.ofString());
         boolean ok = response.statusCode() == 200;

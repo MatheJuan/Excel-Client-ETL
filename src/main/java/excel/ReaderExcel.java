@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 public class ReaderExcel {
     private static final String path= "C:/test";
-    public static void main(String[] args) throws FileNotFoundException {
+     static void main() throws FileNotFoundException {
         FileInputStream file = new FileInputStream(new File(ReaderExcel.path));
 
         try {
