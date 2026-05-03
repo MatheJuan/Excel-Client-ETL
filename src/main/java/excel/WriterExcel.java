@@ -10,8 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class WriterExcel {
-//criar nova linha e preenche as cells
-
+        //criar nova linha e preenche as cells
       public static void addExcel(Cliente cliente){
         try {
             FileInputStream file = new FileInputStream("C:/teste");

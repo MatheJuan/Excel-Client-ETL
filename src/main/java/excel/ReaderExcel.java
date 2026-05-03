@@ -41,7 +41,7 @@ public class ReaderExcel {
                             cliente.setMac(cell.getStringCellValue()); break;
                     }
                 }
-                if(MacVendorsConsumer.MacValidator(cliente.getMac())){ // API do MACVENDORS . fazer depois
+                if(MacVendorsConsumer.isValid(cliente.getMac())){ // API do MACVENDORS . XXX
                     WriterExcel.addExcel(cliente);
                 }
             }
