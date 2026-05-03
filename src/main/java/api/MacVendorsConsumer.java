@@ -7,7 +7,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public  class MacVendorsConsumer {
-    private static final HttpClient cliente = HttpClient.newHttpClient();
+    public static final HttpClient cliente = HttpClient.newHttpClient();
 
     public static boolean isValid(String mac){
         try {
@@ -15,7 +15,7 @@ public  class MacVendorsConsumer {
                 .uri(URI.create("https://api.macvendors.com"+mac)).GET().build();
 
         HttpResponse<String> response = cliente.send(request, HttpResponse.BodyHandlers.ofString());
-        boolean ok = response.statusCode() == 200;
+        boolean ok = response.statusCode()==200;
         boolean hasContent = !response.body().isBlank();
 
         return  ok && hasContent;

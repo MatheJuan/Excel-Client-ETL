@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 
 import api.MacVendorsConsumer;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,7 +19,7 @@ import java.util.Iterator;
 public class ReaderExcel {
     private static final String path= "C:/test";
      static void main() throws FileNotFoundException {
-        FileInputStream file = new FileInputStream(new File(ReaderExcel.path));
+        FileInputStream file = new FileInputStream(ReaderExcel.path);
 
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -27,21 +28,22 @@ public class ReaderExcel {
 
             while(rowIterator.hasNext()){
                 Row row = rowIterator.next();
-                Iterator<Cell> cellIterator = row.cellIterator(); //Ele ignora células vazias============
+                //
                 Cliente cliente = new Cliente();
+                Cell cell0 = row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                Cell cell1 = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                Cell cell2 = row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-                while(cellIterator.hasNext()){
-                    Cell cell = cellIterator.next();
-                    switch (cell.getColumnIndex()){
-                        case 0:
-                            cliente.setId(Long.parseLong(cell.getStringCellValue())); break;
-                        case 1:
-                            cliente.setNome(cell.getStringCellValue()); break;
-                        case 2:
-                            cliente.setMac(cell.getStringCellValue()); break;
-                    }
+                if(cell0.getCellType() == CellType.NUMERIC){
+                    cliente.setId((long) cell0.getNumericCellValue());
+
+                }else if(cell0.getCellType() == CellType.STRING && !cell0.getStringCellValue().isBlank()){
+                    cliente.setId(Long.parseLong(cell0.getStringCellValue()));
                 }
-                if(MacVendorsConsumer.isValid(cliente.getMac())){ // API do MACVENDORS . XXX
+                cliente.setNome(cell1.getStringCellValue());
+                cliente.setMac(cell2.getStringCellValue());
+
+                if(MacVendorsConsumer.isValid(cliente.getMac())){ // API do MACVENDORS. concluido
                     WriterExcel.addExcel(cliente);
                 }
             }
