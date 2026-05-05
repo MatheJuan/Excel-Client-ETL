@@ -12,13 +12,18 @@ import java.io.IOException;
 
 public class WriterExcel {
         //cria nova linha e preenche as cells
+
         public static void addExcel(Cliente cliente) {
-            String caminho = "C:/teste/clientes.xlsx";
+            String caminho = "C:/teste/clientesRB.xlsx";
             File arquivo = new File(caminho);
             XSSFWorkbook workbook;
             XSSFSheet sheet;
 
-            try {
+            try {//confirma que a pasta já existe
+                if(arquivo.getParentFile() != null && arquivo.getParentFile().exists()){
+                    arquivo.getParentFile().mkdir();
+
+                }
                 if (arquivo.exists()) {
                     FileInputStream file = new FileInputStream(arquivo);
                     workbook = new XSSFWorkbook(file);
@@ -41,7 +46,7 @@ public class WriterExcel {
                 newRow.createCell(1).setCellValue(cliente.getNome());
                 newRow.createCell(2).setCellValue(cliente.getId_login());
                 newRow.createCell(3).setCellValue(cliente.isLogin_ativo());
-                newRow.createCell(4).setCellValue(cliente.isLogin_ativo());
+                newRow.createCell(4).setCellValue(cliente.isLogin_online());
                 newRow.createCell(5).setCellValue(cliente.getMac());
 
                 FileOutputStream saida = new FileOutputStream(arquivo);

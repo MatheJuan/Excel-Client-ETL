@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import api.MacVendorsConsumer;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class ReaderExcel {
-    private static final String path = "H:/Downloads/macsBD.xlsl";
+    private static final String path = "H:/Downloads/macsBD.xlsx";
 
     public static void main(String[] args) throws FileNotFoundException {
         FileInputStream file = new FileInputStream(ReaderExcel.path);
@@ -24,12 +25,20 @@ public class ReaderExcel {
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(0);
+            DataFormatter formatter = new DataFormatter();
+
             Iterator<Row> rowIterator = sheet.iterator();
 
-            while(rowIterator.hasNext()){
+            // pula cabeçalho
+            if (rowIterator.hasNext()) {
+                rowIterator.next();
+            }
+
+            while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                //Evita iteracao com coluna vazia - apenas células que existem. evita celular nulas
+
                 Cliente cliente = new Cliente();
+
                 Cell cell0 = row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 Cell cell1 = row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 Cell cell2 = row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
@@ -37,19 +46,38 @@ public class ReaderExcel {
                 Cell cell4 = row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                 Cell cell5 = row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
-                if(cell0.getCellType() == CellType.NUMERIC){
-                    cliente.setId((long) cell0.getNumericCellValue());
-
-                }else if(cell0.getCellType() == CellType.STRING && !cell0.getStringCellValue().isBlank()){
-                    cliente.setId(Long.parseLong(cell0.getStringCellValue()));
+                // ID
+                String idStr = formatter.formatCellValue(cell0).trim();
+                if (!idStr.isEmpty() && idStr.matches("\\d+")) {
+                    cliente.setId(Long.parseLong(idStr));
                 }
-                cliente.setNome(cell1.getStringCellValue());
-                cliente.setId_login(Long.parseLong(cell2.getStringCellValue()));
-                cliente.setLogin_ativo(Boolean.parseBoolean(cell3.getStringCellValue()));
-                cliente.setLogin_online(Boolean.parseBoolean(cell4.getStringCellValue()));
-                cliente.setMac(cell5.getStringCellValue());
 
-                if(MacVendorsConsumer.isValid(cliente.getMac())){ // API do MACVENDORS. concluido
+                // Nome
+                cliente.setNome(formatter.formatCellValue(cell1));
+
+                // ID_LOGIN
+                String idLoginStr = formatter.formatCellValue(cell2).trim();
+                if (!idLoginStr.isEmpty() && idLoginStr.matches("\\d+")) {
+                    cliente.setId_login(Long.parseLong(idLoginStr));
+                }
+
+                // Booleanos
+                cliente.setLogin_ativo(Boolean.parseBoolean(formatter.formatCellValue(cell3)));
+                cliente.setLogin_online(Boolean.parseBoolean(formatter.formatCellValue(cell4)));
+
+                // MAC
+                String mac = formatter.formatCellValue(cell5).trim();
+
+                if (mac.isEmpty() || mac.equalsIgnoreCase("null")) {
+                    System.out.println("MAC vazio - pulando linha> "+ cliente.getId());
+                    continue;
+                }
+
+                cliente.setMac(mac);
+
+                System.out.println("MAC sendo validado: " + mac);
+                if (MacVendorsConsumer.isValid(mac)) {
+                    System.out.println("MAC válido, salvando...");
                     WriterExcel.addExcel(cliente);
                 }
             }

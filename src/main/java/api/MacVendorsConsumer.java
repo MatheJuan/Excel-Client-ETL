@@ -16,14 +16,14 @@ public  class MacVendorsConsumer {
 
         HttpResponse<String> response = cliente.send(request, HttpResponse.BodyHandlers.ofString());
         boolean accept = response.statusCode()==200;//(true)
-        boolean hasContent = response.body().isBlank();
         String isrouterBoard = response.body();
 
-        if(!accept || !hasContent){
+        if(!accept || response.body().isEmpty()){
+            System.out.println("mac "+ mac + " vazio/not200");
             return false;
         }
 
-        return isrouterBoard.equals("Routerboard.com");
+        return isrouterBoard.equalsIgnoreCase("Routerboard.com");
 
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
