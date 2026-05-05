@@ -9,19 +9,25 @@ import java.net.http.HttpResponse;
 public  class MacVendorsConsumer {
     public static final HttpClient cliente = HttpClient.newHttpClient();
 
-    public static boolean isValid(String mac){
+    public static Boolean isValid(String mac){
         try {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.macvendors.com"+mac)).GET().build();
+                .uri(URI.create("https://api.macvendors.com/"+mac)).GET().build();
 
         HttpResponse<String> response = cliente.send(request, HttpResponse.BodyHandlers.ofString());
-        boolean ok = response.statusCode()==200;
-        boolean hasContent = !response.body().isBlank();
+        boolean accept = response.statusCode()==200;//(true)
+        boolean hasContent = response.body().isBlank();
+        String isrouterBoard = response.body();
 
-        return  ok && hasContent;
+        if(!accept || !hasContent){
+            return false;
+        }
+
+        return isrouterBoard.equals("Routerboard.com");
 
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
+
         }
        }
 }
