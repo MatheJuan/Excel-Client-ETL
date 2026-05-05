@@ -14,13 +14,18 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 public class ReaderExcel {
     private static final String path = "H:/Downloads/macsBD.xlsx";
 
     public static void main(String[] args) throws FileNotFoundException {
         FileInputStream file = new FileInputStream(ReaderExcel.path);
+        // Lista de consulta de OUIs
+        Map<String, Boolean> macList = new HashMap<>();
 
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -68,15 +73,27 @@ public class ReaderExcel {
                 // MAC
                 String mac = formatter.formatCellValue(cell5).trim();
 
-                if (mac.isEmpty() || mac.equalsIgnoreCase("null")) {
+                if (mac.isEmpty() || mac.equalsIgnoreCase("null")) {// Valida se a cell do mac esta vazia
                     System.out.println("MAC vazio - pulando linha> "+ cliente.getId());
                     continue;
                 }
-
                 cliente.setMac(mac);
 
+
+                String prefix = mac.substring(0,8).toUpperCase();// primeiros OUI do mac
+                if(macList.containsKey(prefix)){
+                    boolean resultado = macList.get(prefix);
+                    if(resultado){
+                        WriterExcel.addExcel(cliente);
+                    }continue;
+                }
+
+                boolean isRouterboard = MacVendorsConsumer.isValid(mac);
+
+                macList.put(prefix, isRouterboard);// salva result na lista
+
                 System.out.println("MAC sendo validado: " + mac);
-                if (MacVendorsConsumer.isValid(mac)) {
+                if (isRouterboard) {
                     System.out.println("====MAC-VALIDO, SALVANDO: " + cliente.getNome()+" ===");
                     WriterExcel.addExcel(cliente);
                 }
