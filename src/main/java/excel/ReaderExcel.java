@@ -77,7 +77,7 @@ public class ReaderExcel {
 
                 System.out.println("MAC sendo validado: " + mac);
                 if (MacVendorsConsumer.isValid(mac)) {
-                    System.out.println("MAC válido, salvando...");
+                    System.out.println("====MAC-VALIDO, SALVANDO: " + cliente.getNome()+" ===");
                     WriterExcel.addExcel(cliente);
                 }
             }

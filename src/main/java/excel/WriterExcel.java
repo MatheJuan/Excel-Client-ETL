@@ -16,13 +16,18 @@ public class WriterExcel {
         public static void addExcel(Cliente cliente) {
             String caminho = "C:/teste/clientesRB.xlsx";
             File arquivo = new File(caminho);
+
+            //======
+            System.out.println("Salvando em: " + arquivo.getAbsolutePath());
+            System.out.println("Arquivo já existe? " + arquivo.exists());
+            //======
             XSSFWorkbook workbook;
             XSSFSheet sheet;
 
             try {//confirma que a pasta já existe
                 if(arquivo.getParentFile() != null && arquivo.getParentFile().exists()){
                     arquivo.getParentFile().mkdir();
-
+                    System.out.println(arquivo.getAbsolutePath());
                 }
                 if (arquivo.exists()) {
                     FileInputStream file = new FileInputStream(arquivo);
