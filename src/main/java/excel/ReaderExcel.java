@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 
 import api.MacVendorsConsumer;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -15,7 +14,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -26,7 +24,7 @@ public class ReaderExcel {
         FileInputStream file = new FileInputStream(ReaderExcel.path);
         // Lista de consulta de OUIs
         Map<String, Boolean> macList = new HashMap<>();
-
+        int qtdClientes=0;
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(0);
@@ -59,7 +57,7 @@ public class ReaderExcel {
 
                 // Nome
                 cliente.setNome(formatter.formatCellValue(cell1));
-
+                qtdClientes++; System.out.println(qtdClientes+"<linha [Cliente: "+cliente.getId()+" "+cliente.getNome()+"]");
                 // ID_LOGIN
                 String idLoginStr = formatter.formatCellValue(cell2).trim();
                 if (!idLoginStr.isEmpty() && idLoginStr.matches("\\d+")) {
@@ -74,7 +72,7 @@ public class ReaderExcel {
                 String mac = formatter.formatCellValue(cell5).trim();
 
                 if (mac.isEmpty() || mac.equalsIgnoreCase("null")) {// Valida se a cell do mac esta vazia
-                    System.out.println("MAC vazio - pulando linha> "+ cliente.getId());
+                    System.out.println("Célula com mac vazio =="+ cliente.getId());
                     continue;
                 }
                 cliente.setMac(mac);
@@ -84,17 +82,22 @@ public class ReaderExcel {
                 if(macList.containsKey(prefix)){
                     boolean resultado = macList.get(prefix);
                     if(resultado){
+                        System.out.println("*** Salvo pela sem chamar API "+"cliente>"+ cliente.getId() +"***");
                         WriterExcel.addExcel(cliente);
                     }continue;
                 }
+                System.out.println("Validando MAC: [" + mac + "]");
+               boolean isRouterboard = MacVendorsConsumer.isValid(mac);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                System.out.println("Resultado API: " + isRouterboard);
+                macList.put(prefix, isRouterboard);// salva resultado na lista
 
-                boolean isRouterboard = MacVendorsConsumer.isValid(mac);
-
-                macList.put(prefix, isRouterboard);// salva result na lista
-
-                System.out.println("MAC sendo validado: " + mac);
                 if (isRouterboard) {
-                    System.out.println("====MAC-VALIDO, SALVANDO: " + cliente.getNome()+" ===");
+                    System.out.println("====MAC CONSULTADO PELO VENDORS, SALVANDO: " + cliente.getNome()+" MAC:"+ cliente.getMac()+"===");
                     WriterExcel.addExcel(cliente);
                 }
             }

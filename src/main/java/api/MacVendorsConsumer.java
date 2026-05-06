@@ -22,6 +22,11 @@ public  class MacVendorsConsumer {
             System.out.println("mac "+ mac + " vazio/not200");
             return false;
         }
+            System.out.println("----------------------");
+            System.out.println("MAC: " + mac);
+            System.out.println("Status: " + response.statusCode());
+            System.out.println("Body: [" + response.body() + "]");
+            System.out.println("----------------------");
 
         return isrouterBoard.equalsIgnoreCase("Routerboard.com");
 

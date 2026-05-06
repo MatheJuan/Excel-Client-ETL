@@ -14,7 +14,7 @@ public class WriterExcel {
         //cria nova linha e preenche as cells
 
         public static void addExcel(Cliente cliente) {
-            String caminho = "C:/teste/clientesRB.xlsx";
+            String caminho = "C:/teste/BDclientes.xlsx";
             File arquivo = new File(caminho);
 
             //======
@@ -62,4 +62,5 @@ public class WriterExcel {
                 throw new RuntimeException(e);
             }
         }
+        // Nota: validado que ocorre gargalo principal aqui pois fecha e abre a cada consulta.
 }
